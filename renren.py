@@ -8,7 +8,8 @@ import os
 import re
 
 
-cookie_path = 'cookies'
+base_path = os.path.dirname(__file__)
+cookie_path = os.path.join(base_path, 'cookies')
 
 if not os.path.exists(cookie_path):
     os.makedirs(cookie_path) 
@@ -76,14 +77,14 @@ def login(user, password, use_cache=True):
     if rsp.get('location', None) == home:  # redirect to home if success
         headers['Cookie'] = rsp['set-cookie']
         rsp2, content = h.request(home, headers=headers)
-        with open('login_success_rsp.log', 'a') as f:
+        with open(os.path.join(base_path, 'login_success_rsp.log'), 'a') as f:
             f.write(str(rsp2) + '\n\n')
         cookie = rsp2['set-cookie']
         __save_cookie(user, cookie)
         return cookie
         # request again with this cookie
     else:  # redirect to login page again if failed
-        with open('login_failed_{}.html'.format(user), 'w') as f:
+        with open(os.path.join(base_path, 'login_failed_{}.html'.format(user)), 'w') as f:
             f.write(content)
         return None
 
