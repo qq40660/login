@@ -13,22 +13,6 @@ cookie_path = 'cookies'
 if not os.path.exists(cookie_path):
     os.makedirs(cookie_path) 
 
-def __full_filename(user):
-    return os.path.join(cookie_path, '%s.cookie' % user)
-
-def __save_cookie(user, cookie):
-    with open(__full_filename(user), 'w') as f:
-        f.write(cookie)
-
-def __get_cookie(user):
-    filename = __full_filename(user)
-    if not os.path.exists(filename):
-        return None
-    with open(filename, 'r') as f:
-        cookie = f.read()
-    return cookie
-
-
 headers_template = {
     'Connection': 'keep-alive',
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.65 Safari/534.24',
@@ -39,6 +23,24 @@ headers_template = {
     'Accept-Language': 'zh-CN,zh;q=0.8',
     'Cache-Control': 'no-cache',
 }
+
+
+def __full_filename(user):
+    return os.path.join(cookie_path, '%s.cookie' % user)
+
+
+def __save_cookie(user, cookie):
+    with open(__full_filename(user), 'w') as f:
+        f.write(cookie)
+
+
+def __get_cookie(user):
+    filename = __full_filename(user)
+    if not os.path.exists(filename):
+        return None
+    with open(filename, 'r') as f:
+        cookie = f.read()
+    return cookie
 
 
 def login(user, password, use_cache=True):
@@ -85,13 +87,15 @@ def login(user, password, use_cache=True):
             f.write(content)
         return None
 
-def renrenId(cookie):
+
+def parseRenrenId(cookie):
     proj = re.compile(r'feedType=(\d+)_hot;')
     m = proj.search(cookie)
     if m is not None:
         return m.group(1)
     else:
         return None
+
 
 if __name__ == '__main__':
     from settings import account
