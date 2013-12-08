@@ -75,14 +75,9 @@ def login(user, password, use_cache=True):
     rsp, content = h.request(url, 'POST', headers=headers, body=body)  # response 302
 
     if rsp.get('location', None) == home:  # redirect to home if success
-        headers['Cookie'] = rsp['set-cookie']
-        rsp2, content = h.request(home, headers=headers)
-        with open(os.path.join(base_path, 'login_success_rsp.log'), 'a') as f:
-            f.write(str(rsp2) + '\n\n')
-        cookie = rsp2['set-cookie']
+        cookie = rsp['set-cookie']
         __save_cookie(user, cookie)
         return cookie
-        # request again with this cookie
     else:  # redirect to login page again if failed
         with open(os.path.join(base_path, 'login_failed_{}.html'.format(user)), 'w') as f:
             f.write(content)
@@ -90,7 +85,7 @@ def login(user, password, use_cache=True):
 
 
 def parseRenrenId(cookie):
-    proj = re.compile(r'feedType=(\d+)_hot;')
+    proj = re.compile(r'\Wid=(\d+);')
     m = proj.search(cookie)
     if m is not None:
         return m.group(1)
